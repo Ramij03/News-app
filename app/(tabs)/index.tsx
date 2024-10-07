@@ -15,6 +15,7 @@ const Page = () => {
   const [breakingNews, setBreakingNews] = useState<NewsDataType[]>([]);
   const [News, setNews] = useState<NewsDataType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery,setsearchQuery]=useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>('business'); // Default category
 
   useEffect(() => {
@@ -60,7 +61,7 @@ const Page = () => {
     return (
       <>
         <Header />
-        <SearchBar />
+        <SearchBar setSreachQuery={setsearchQuery}/>
         {isLoading ? (
           <ActivityIndicator size="large" color={Colors.black} />
         ) : (

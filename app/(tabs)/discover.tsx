@@ -1,63 +1,55 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useState } from 'react'
 import SearchBar from '@/components/SearchBar'
-import Categories from '@/components/Categories'
-import { NewsDataType } from '@/types'
-import axios from 'axios'
-import Countries from '@/components/Countries'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Colors } from '@/constants/Colors'
+import CheckBox from '@/components/CheckBox'
+import useNewsCategories from '@/constants/useNewsCategories'
+import useNewsCountries from '@/constants/useNewsCountries'
+import { Link } from 'expo-router'
 
 type Props = {}
 
 const Page = (props: Props) => {
-  const [News, setNews] = useState<NewsDataType[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [NewsCountry, setNewsCountry] = useState<NewsDataType[]>([]);
-  const getNews = async (category:string='') => {
-    try {
-      let categoryString='';
-      if(category.length!=0){
-        categoryString=`&category=${category}`
-      }
-      const URL = `https://newsdata.io/api/1/news?apikey=${process.env.EXPO_PUBLIC_API_KEY}&language=ar,en&image=1&removeduplicate=1&size=10&${categoryString}`;
-      const response = await axios.get(URL);
-      if (response && response.data) {
-        setNews(response.data.results);
-        setIsLoading(false);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  const onCatChanged = (category: string) => {
-    setNews([]);
-    getNews(category);
-  };
-  const getNewsCountry = async (country:string='') => {
-    try {
-      let countryString='';
-      if(country.length!=0){
-        countryString=`&country=${country}`
-      }
-      const URL = `https://newsdata.io/api/1/news?apikey=${process.env.EXPO_PUBLIC_API_KEY}&language=ar,en&image=1&removeduplicate=1&size=10&${countryString}`;
-      const response = await axios.get(URL);
-      if (response && response.data) {
-        setNews(response.data.results);
-        setIsLoading(false);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  const onCountryChanged = (category: string) => {
-    setNewsCountry([]);
-    getNewsCountry(category);
-  };
+  const { top: safeTop } = useSafeAreaInsets();
 
+  const {newsCategories,toggleNewsCategory}= useNewsCategories();
+  const {newsCountry,toggleNewsCountry}= useNewsCountries();
+  const [searchQuery,setsearchQuery]=useState("");
+  const [category,setCategory]=useState("");
+  const [country,setCountry]=useState("");
   return (
-    <View style={styles.container}>
-      <SearchBar />
-      <Categories onCategoryChanged={onCatChanged}/>
-      <Countries onCountryChanged={onCountryChanged}/>
+
+    <View style={[styles.container, { paddingTop: safeTop +20 }]} >
+      <SearchBar setSreachQuery={setsearchQuery}/>
+      <View style={styles.catContainer}>
+        <Text style={styles.title}>Categories</Text>
+        <View style={styles.listcontainer}>{newsCategories.map((item) =>(
+          <CheckBox key={item.id} label={item.title} checked={item.selected} onPress={()=>{
+            toggleNewsCategory(item.id)
+            setCategory(item.slug)
+          }}/>
+        ))}</View>
+      </View>
+
+      <View style={styles.catContainer}>
+        <Text style={styles.title}>Countries</Text>
+        <View style={styles.listcontainer}>{newsCountry.map((item,index) =>(
+          <CheckBox key={item.code} label={item.name} checked={item.selected} onPress={()=>{
+            toggleNewsCountry(index)
+            setCountry(item.code)
+          }}/>
+        ))}</View>
+      </View>
+      <Link href={{
+        pathname: `/newssearch`,
+        params:{query:searchQuery, category,country}
+        
+      }} asChild>
+      <TouchableOpacity style={styles.searchBtn}>
+        <Text style={styles.searchbtnText}>Search</Text>
+      </TouchableOpacity>
+      </Link>
     </View>
   )
 }
@@ -67,6 +59,28 @@ export default Page
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop:60,
+  },
+  catContainer:{
+    paddingHorizontal:20,
+  },
+  listcontainer:{
+
+  },
+  title:{
+    fontSize:24,
+    fontWeight:'600',
+    color:Colors.black,
+    marginBottom:10,
+  },
+  searchBtn:{
+    backgroundColor:Colors.tint,
+    alignItems:'center',
+    padding:14,borderRadius:10,
+    marginVertical:10,
+  },
+  searchbtnText:{
+    color:Colors.white,
+    fontSize:16,
+    fontWeight:'600'
   },
 })

@@ -4,13 +4,20 @@ import { Ionicons } from '@expo/vector-icons'
 import { Colors } from '@/constants/Colors'
 
 
-type Props = {}
+type Props = {
+  setSreachQuery: Function
+}
 
-const SearchBar = (props: Props) => {
+const SearchBar = ({setSreachQuery}: Props) => {
   return (
     <View  style={styles.container}>
         <Ionicons name="search-outline" size={20} color={Colors.lightGrey}/>
-      <TextInput style={styles.text} placeholder='Search' placeholderTextColor={Colors.lightGrey} autoCapitalize="none"/>
+      <TextInput style={styles.text} 
+      placeholder='Search' 
+      placeholderTextColor={Colors.lightGrey} 
+      autoCapitalize="none"
+      onChangeText={query => setSreachQuery(query)}
+      />
     </View>
   )
 }

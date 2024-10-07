@@ -15,6 +15,18 @@ const NewsList = ({newsList}: Props) => {
       {newsList.map((item,index)=>(
         <Link href={`/news/${item.article_id}`} asChild key={index}>
         <TouchableOpacity>
+            <NewsItem item={item} />
+        </TouchableOpacity></Link>
+      ))}
+    </View>
+    
+    
+  )
+}
+export default NewsList
+
+export const NewsItem = ({item}:{item:NewsDataType}) =>{
+    return(
         <View style={styles.itemContainer}>
             <Image source={{uri :item.image_url}} style={styles.itemImage}/>
             <View style={styles.itemInfo}>
@@ -27,16 +39,8 @@ const NewsList = ({newsList}: Props) => {
             </View>
             
         </View>
-        </TouchableOpacity></Link>
-      ))}
-    </View>
-    
-    
-  )
+    )
 }
-
-export default NewsList
-
 const styles = StyleSheet.create({
     container:{
         marginHorizontal:20,
